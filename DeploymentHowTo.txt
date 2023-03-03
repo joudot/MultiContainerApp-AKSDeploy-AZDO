@@ -1,0 +1,38 @@
+REGISTRY_PASSWORD="XXXXXXXXX"
+RESOURCE_GROUP="joudot-aca-rg"
+CONTAINERAPPS_ENVIRONMENT="joudot-aca-env"
+REGISTRY_USERNAME="joudotacr"
+
+az containerapp create\
+  --name demowebapi \
+  --resource-group $RESOURCE_GROUP \
+  --environment $CONTAINERAPPS_ENVIRONMENT \
+  --image dapriosamples/hello-k8s-node:latest \
+  --target-port 9000 \
+  --ingress 'external' \
+  --cpu 1 \
+  --memory 2.0Gi \
+  --min-replicas 1 \
+  --max-replicas 3 \
+  --env-vars 'APP_PORT=9000' \
+  --revisions-mode multiple \
+  --registry-server $REGISTRY_USERNAME.azurecr.io \
+  --registry-username joudotacr \
+  --registry-password $REGISTRY_PASSWORD
+
+az containerapp create\
+  --name demowebapp \
+  --resource-group $RESOURCE_GROUP \
+  --environment $CONTAINERAPPS_ENVIRONMENT \
+  --image dapriosamples/hello-k8s-node:latest \
+  --target-port 80 \
+  --ingress 'external' \
+  --cpu 1 \
+  --memory 2.0Gi \
+  --min-replicas 1 \
+  --max-replicas 3 \
+  --env-vars 'APP_PORT=80' \
+  --revisions-mode multiple \
+  --registry-server $REGISTRY_USERNAME.azurecr.io \
+  --registry-username $REGISTRY_USERNAME \
+  --registry-password $REGISTRY_PASSWORD
