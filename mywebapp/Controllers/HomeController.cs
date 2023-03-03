@@ -43,7 +43,7 @@ namespace mywebapp.Controllers
         public async Task<IActionResult> Quotes()
         {
 
-            var response = await client.GetStringAsync("https://demowebapi.agreeableforest-40d75867.westeurope.azurecontainerapps.io/api/quotes");
+            var response = await client.GetStringAsync("http://demowebapi:9000/api/quotes");
             ViewData["Message"] = response; //"Sessions";
             
             return View();
