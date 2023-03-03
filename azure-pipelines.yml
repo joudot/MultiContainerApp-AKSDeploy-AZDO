@@ -55,7 +55,7 @@ stages:
     - task: CmdLine@2
       displayName: 'Replace build number in backend-webapp.yaml file'
       inputs:
-        script: 'bash -c "sed -i ''s/BuildNumber/$(Build.BuildId)/g'' backend-webapp.yaml"'
+        script: 'bash -c "sed -i ''s/BuildNumber/$(Build.BuildId)/g'' frontend-webapp.yaml"'
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact: backend-webapi.yaml'
       inputs:
