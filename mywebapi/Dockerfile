@@ -1,22 +1,21 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS builder
 WORKDIR /app
 
-# Copy csproj and restore as distinct layers
-COPY *.csproj ./
+# caches restore result by copying csproj file separately
+COPY *.csproj .
 RUN dotnet restore
 
-# Copy everything else and build
-COPY . ./
-RUN dotnet publish -c Release -o out
+COPY . .
+RUN dotnet publish --output /app/ --configuration Release --no-restore
+RUN sed -n 's:.*<AssemblyName>\(.*\)</AssemblyName>.*:\1:p' *.csproj > __assemblyname
+RUN if [ ! -s __assemblyname ]; then filename=$(ls *.csproj); echo ${filename%.*} > __assemblyname; fi
 
-
-# Build runtime image
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
+# Stage 2
+FROM mcr.microsoft.com/dotnet/aspnet:6.0
 WORKDIR /app
-COPY --from=build-env /app/out .
+COPY --from=builder /app .
 
-# Expose port 9000
-ENV ASPNETCORE_URLS http://+:9000
-EXPOSE 9000
+ENV PORT 9001
+EXPOSE 9001
 
-ENTRYPOINT ["dotnet", "mywebapi.dll"] 
+ENTRYPOINT dotnet $(cat /app/__assemblyname).dll --urls "http://*:9001"
